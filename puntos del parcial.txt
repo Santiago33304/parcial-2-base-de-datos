@@ -24,28 +24,28 @@ Nota: niño es considerado inferior a 12 años y un viejo es alguien mayor de 70
 Recuerda que no se admiten personas enfermas.
 
 
-CREATE OR REPLACE TRIGGER validar_ingreso
-before insert or update
-ON workers
-FOR EACH ROW
-    DECLARE
-        var_edad NUMBER;
-        var_healthy NUMBER;
-        BEGIN
-            SELECT EXTRACT(YEAR FROM CURRENT_DATE)-EXTRACT(YEAR FROM BIRTHDATE)
-                INTO var_edad FROM PERSONS 
-                    WHERE persons_id=:NEW.persons_id;
-            SELECT diagnostics_id into var_healthy
-                from persons_medical_check
-                    where persons_id=:NEW.persons_id;
-            IF(var_healthy!=1) then
-                raise_application_error(-20001,'La persona con el id' || :NEW.persons_id || 'NO ESTA EN CONDICIONES');
-            END IF;
-            IF(var_edad<12 OR var_edad>70) then
-                raise_application_error(-20001,'La PERSONA CON EL ID ' || :NEW.persons_id || 'NO PUEDE SER UN TRABAJADOR');
-            END IF;
-            
-    END validar_ingreso;
+CREATE OR REPLACE TRIGGER 
+tr_rest_mina
+BEFORE INSERT OR UPDATE ON workers FOR EACH ROW
+DECLARE
+var_edad_persona DAte;
+fecha_actual DATE;
+edad number(2);
+VAR_ESTADO NUMBER;
+BEGIN
+SELECT birthdate INTO var_edad_persona FROM persons WHERE persons_id=:new.persons_id;
+SELECT DIAGNOSTICS_ID INTO VAR_ESTADO FROM PERSONS_MEDICAL_CHECK WHERE PERSONS_ID=:NEW.PERSONS_ID;
+fecha_actual:=sysdate;
+EDAD:= (FECHA_ACTUAL-VAR_edad_persona)/365;
+CASE
+WHEN edad<12 OR EDAD>70 then
+RAISE_APPLICATION_ERROR(-20001,'En la mina no se permiten niños ni ancianos');
+
+WHEN VAR_ESTADO !=1 THEN
+RAISE_APPLICATION_ERROR(-20001,'En la mina no se permiten enfermos o con deficiencias');
+END CASE;
+END;
+
 
 
 ///////////////////////////////////////////////////////
