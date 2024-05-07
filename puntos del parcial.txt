@@ -107,29 +107,25 @@ EXECUTE prc_4('&mina')
 
 
 
-CREATE OR REPLACE FUNCTION deadOrLive(
-var_personId persons_defuntions.persons_id%type
-)
+CREATE OR REPLACE FUNCTION 
+vivo_o_muerto(trabajador workers.workers_id%TYPE)
 RETURN VARCHAR2
-IS  
-    tipe_death NUMBER;
-    deadOrNoet VARCHAR(100);
-    BEGIN
-        SELECT DEATHS_ID INTO tipe_death FROM persons_defuntions 
-        WHERE persons_id=var_personId;
-        IF(tipe_death>=1 AND tipe_death<=5)THEN
-            deadOrNoet:='EL USUARIO ESTA MUERTO';
-        END IF;
-        RETURN deadOrNoet;
-        EXCEPTION
-            WHEN NO_DATA_FOUND  THEN
-            tipe_death:=0;
-            deadOrNoet:='EL USUARIO ESTA VIVO';
-            RETURN deadOrNoet;
-END deadOrLive ;
+IS
+  var_1 NUMBER;
+  var_boolean boolean;
+BEGIN
+  BEGIN
+  var_boolean:=true;
+    SELECT persons_id into var_1 FROM persons_defuntions WHERE persons_id=trabajador;
+   RETURN 'EL TRABAJADOR CON ID: '||trabajador||' PERDIO LA VIDA';
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      var_boolean:=false;
+      RETURN 'EL TRABAJADOR CON ID: '||trabajador||' SE ENCUENTRA CON VIDA';
+  END;
+END;
+SELECT vivo_o_muerto(39452) from dual;
 
-SELECT deadOrLive(1)FROM DUAL ;
-SELECT deadOrLive(135)FROM DUAL ;
 
 
 
